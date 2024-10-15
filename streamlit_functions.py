@@ -21,7 +21,7 @@ def reset_settings():
     st.session_state.clear()
 
 def choose_podcast_option():
-    help_message = "Recommended choice: Try a sample.\n\nUse the iTunes URL option if you want to interact with a specific episode.\n\nUse the name option if you want to interact with a podcast's most recent episode."
+    help_message = "* 🧪 Try a sample.\n\n* ⬇️ Provide an iTunes URL for a specific episode.\n\n* 🔍 Search for a podcast by keyword. The app will download the podcast's most recent episode."
 
     st.header("Select a podcast source", help=help_message)
     episode_option = st.radio(
@@ -55,7 +55,7 @@ def choose_podcast_option():
             st.warning("Please enter a valid search term.")
 
 def choose_encoder():
-    help_message = "Recommended choice: T5.\n\nThe OpenAI tokenizer is less performant.\n\n⚠️ Please note that an API key will be required in order to use the OpenAI tokenizer, which may incur an additional cost. For more details see: https://openai.com/index/openai-api/"
+    help_message = "* T5 is a text encoder developed at Google. It’s open source and free to use.\n\n* The OpenAI embeddings-3 tokenizer. ⚠️ This option requires an API key. You can get one here: https://openai.com/index/openai-api/\n\n 🚀 T5 is faster and produces better results. "
     st.subheader('Select a sentence encoder', help=help_message)
     sentence_encoder = st.radio(
         "Choose your option:",
@@ -81,7 +81,7 @@ def choose_encoder():
                 st.warning("Invalid API key. Please provide a valid API token.")
 
 def choose_transcription_method():
-    help_message = "Recommended choice: Replicate.\n\nUse the local transcription if you have access to a GPU and can deploy this app locally.\n\n⚠️ Please note that an API key will be required in order to use the Replicate transcriber. For more details see: https://replicate.com/home"
+    help_message = "* Local transcription. This option is recommended if you have access to a GPU.\n\n * Replicate. This is a cloud service that hosts and runs LLMs in the cloud. ⚠️ This option requires an API key. You can get one here: https://replicate.com/home\n\n🚀 Local transcription with a GPU is the recommended option. ⚠️ Using a CPU can be slow (a 1-hour episode can be transcribed in approximately 30 minutes). Replicate provides a better alternative."
     st.subheader('Select a transcription method', help=help_message)
     if st.session_state.get('episode_option', False):
         if st.session_state['episode_option'] != "1. Try a sample":
@@ -110,7 +110,7 @@ def choose_transcription_method():
             update_session(transcription_method_selected=True)
 
 def choose_vector_db():
-    help_message = "Recommended choice: ChromaDB.\n\nUse Minsearch if you want a quick preview of the app.\n\nElasticsearch is less performant.\n\n⚠️ Please note that an API key will be required in order to use the Elasticsearch vectorb database. For more details see: https://elasticsearch-py.readthedocs.io/en/v8.10.1/quickstart.html"
+    help_message = "* Minsearch. Not a fully fledged vector database, its a simple tool that uses TF-IDF and python dictionaries to create an index.\n\n* Elasticsearch. A vector database hosted on the cloud. ⚠️ This option requires an API key and a Cloud ID. You can get them here: https://elasticsearch-py.readthedocs.io/en/v8.10.1/quickstart.html\n\n* ChromaDB. An open source vector database is an open source and free to use.\n\n🚀 Elasticsearch produces the best results but is the 🐢 slowest one.\n\n🚀 Minsearch is slightly faster than ChromaDB."
     st.subheader('Select a vector database', help=help_message)
     st.session_state['index_name'] = "podcast-transcriber"
     vector_db = st.radio(
@@ -153,7 +153,7 @@ def choose_vector_db():
         st.success(f"Index {st.session_state['vector_db_client'].list_collections()[0].name} was created successfully.")
 
 def choose_llm():
-    help_message = "Recommended choice: FLAN-5.\n\nUse GPT-4o if want to interact with a more conversant LLM.\n\n⚠️ Please note that an API key will be required in order to use GPT-4o, which may incur an additional cost. For more details see: https://openai.com/index/openai-api/"
+    help_message = "* FLAN-5 is a Google trained LLM, its open source and free to use.\n\n* GPT4-o is an OpenAI LLM. ⚠️ This option requires an API key. You can get one here: https://openai.com/index/openai-api/\n\n🚀 GPT4-o produces more coherent answers."
     st.subheader('Select an LLM', help=help_message)
     llm_option = st.radio(
         "Choose your option:",

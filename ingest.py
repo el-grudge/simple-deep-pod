@@ -139,9 +139,9 @@ def transcribe_podcast(**kwargs):
     else:
         transcription_method = kwargs['transcription_method']
         if transcription_method == "1. Local transcription":
-            chunks, text = transcribe_with_replicate(kwargs['transcription_client'], episode_details['filenames'], n_splits=1)
-        elif transcription_method == "2. Replicate":
             chunks, text = transcribe_with_whistler(episode_details['filenames'], n_splits=1) # 4 splits took 800 seconds / try it in streamlit
+        elif transcription_method == "2. Replicate":
+            chunks, text = transcribe_with_replicate(kwargs['transcription_client'], episode_details['filenames'], n_splits=1)
     
     return {'chunks': chunks, 'text': text}
 

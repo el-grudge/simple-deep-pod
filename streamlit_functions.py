@@ -95,6 +95,8 @@ def choose_transcription_method():
             )
             update_session(transcription_method_selected=False)
             if transcription_method=="1. Local transcription":
+                update_session(transcription_method_selected=True, transcription_method=transcription_method)
+            elif transcription_method=="2. Replicate":
                 replicate_api_key = st.text_input("Replicate API Key", key="file_replicate_api_key", type="password")            
                 if replicate_api_key != '':
                     try:
@@ -103,8 +105,6 @@ def choose_transcription_method():
                         update_session(transcription_method_selected=True, transcription_method=transcription_method, transcription_client=replicate_client)
                     except:
                         st.warning("Invalid API key. Please provide a valid API token.")
-            elif transcription_method=="2. Replicate":
-                update_session(transcription_method_selected=True, transcription_method=transcription_method)
         else:
             st.success("The sample podcast doesn't require a transcription method.")
             update_session(transcription_method_selected=True)

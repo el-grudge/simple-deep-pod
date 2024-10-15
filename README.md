@@ -1,4 +1,6 @@
-# deep-pod
+# DEEP-POD
+
+![demo](./images/demo.gif)
 
 ## Problem description
 
@@ -7,6 +9,10 @@ This is deep-pod 🎙️, a streamlit app that allows you to interact with your 
 1. Chat 💬
 2. Summary 📝
 3. Topic detection 🔍
+
+Check out the [DEEP-POD infographic](DEEP-POD-Infographic.pdf) for a discussion on the general architecture and design of the tool and how each component was evaluated.
+
+**You can try the app [here](https://simple-deep-pod.streamlit.app/) 🚀**
 
 **Chat 💬**
 
@@ -17,11 +23,11 @@ For this functionality, I built a RAG pipeline using the podcast's transcript.
 Podcast episodes are downloaded in one of two ways:
 
 1. By providing a URL for the desired episode
-2. By providing the name of a podcast, for which the latest episode will be downloaded
+2. By providing a keyword
 
 After the mp3 file is downloaded, I proceed to the transcription and indexing processes.
 
-I'm using Replicate's 'incredibly fast whisper' to transcribe the mp3 files 🎵. Replicate provides access to LLMs (and GPUs) using APIs. The incredibly fast whisper costs approximately $0.0079 per run. (in 4 days it cost me $2.14) (https://lnkd.in/eQwqjWEN). Note: Even with Replicate's GPU backed models, transcription can be slow especially for long format podcasts. One trick is to shrink the audio file size by decreasing the file's bit rate and using a mono stream. For a 25 min podcast it can take between 30-45 seconds to transcribe the episode. 
+I'm using [Replicate's](https://replicate.com/vaibhavs10/incredibly-fast-whisper) 'incredibly fast whisper' to transcribe the mp3 files 🎵. Replicate provides access to LLMs (and GPUs) using APIs. The incredibly fast whisper costs approximately $0.0079 per run. (in 4 days it cost me $2.14). Note: Even with Replicate's GPU backed models, transcription can be slow especially for long format podcasts. One trick is to shrink the audio file size by decreasing the file's bit rate and using a mono stream. For a 25 min podcast it can take between 30-45 seconds to transcribe the episode. 
 
 The returned object contains the transcript as a string and as a list of sentences, thus I no longer need to chunk the text (at least for now; I'm considering trying thematic or sentiment chunking to weed out ads).
 
@@ -33,13 +39,11 @@ Good old web scrapping 🕸️
 
 **Topic detection 🔍**
 
-I'm using GLiNER for named entity recognition 🧠 (link: https://lnkd.in/ePMmR2hN). GLiNER is a very strong technique that can detect any kind of topic using bidirectional encoders to process the contexts and to facilitate parallel entity extraction. 
+I'm using [GLiNER](https://huggingface.co/urchade/gliner_base) for named entity recognition 🧠. GLiNER is a very strong technique that can detect any kind of topic using bidirectional encoders to process the contexts and to facilitate parallel entity extraction. 
 
 However, I noticed that its NER detection can be impacted if it's given a large text, on the other hand, it is slow and extra granular when given smaller chunks. This part is still a work in progress. 🚧
 
-**You can try the app here: https://lnkd.in/eqCv-xZC 🚀**
-
-To use it, you will need:
+To use the app, you may need:
 
 - OpenAI API key 🔑
 - Replicate API key 🔑
@@ -47,6 +51,8 @@ To use it, you will need:
 - Elasticsearch Cloud ID ☁️
 
 ## RAG flow
+
+![rag_flow](./images/rag_flow-removebg-preview.png)
 
 *Search*
 
@@ -58,7 +64,7 @@ When a user provides a query in the chat bar, the query is encoded and a semanti
 
 A prompt that includes the search query and the top 5 documents is constructed.
 
-*Text generation*
+*Respond*
 
 And for text generation, I'm using GPT 4o 🤖 (Less than $1 over the past 4 days) (https://lnkd.in/e9fiapjS). The prompt is passed to the completion API and the contents are retrieved and presented to the user.
 
@@ -66,11 +72,45 @@ Check the RAG code [here](rag.py)
 
 ## Retrieval evaluation
 
-⚠️ In progress (...)
+I compared the retrieval performance of the 3 indexes on their Hit-Rate, MRR, and average retrieval time:
+
+![retrieval_evaluations](./images/retrieval_evaluations.png)
+
+| Search Engine | Hit Rate | MRR    | Average Retrieval Time |
+|---------------|----------|--------|------------------------|
+| Minsearch     | 71.69%   | 54.00% | 0.0057 seconds         |
+| Elasticsearch | 74.15%   | 60.90% | 0.0893 seconds         |
+| ChromDB       | 70.80%   | 29.65% | 0.0200 seconds         |
+
+The Hit-Rate (aka Recall) is calculated as follows:
+
+$$\text{Hit-Rate} = \frac{\text{Number of Hits}}{\text{Total Number of Requests}}$$
+
+MRR (Mean Reciprocal Rank) on the other hand is calculated as follows:
+
+$$\text{MRR} = \frac{1}{|Q|} \sum_{i=1}^{|Q|} \frac{1}{\text{rank}_i}$$
+
+Where:
+- $|Q|$ is the total number of queries
+- $\text{rank}_i$ is the rank of the first relevant document for the $i$-th query
+- If no relevant document is retrieved for a query, the reciprocal rank is 0 for that query
+
+The reciprocal rank for a single query is calculated as:
+
+$$\text{reciprocal rank} = \frac{1}{\text{rank of first relevant document}}$$
+
 
 ## RAG evaluation
 
-⚠️ In progress (...)
+The RAG pipeline wass evaluated using an LLM-as-a-judge. A sample of 200 questions is passed to each LLM and the evaluator determines whether the answer is: relevant, partly relevant, or not relevant.
+
+Here are the results:
+
+| Model  | Relevant | Partly Relevant | Not Relevant |
+|--------|----------|-----------------|--------------|
+| GPT-4o | 54.5%    | 36.0%           | 9.5%         |
+| FLAN-5 | 0.00%    | 61.0%           | 39%          |
+
 
 ## Interface
 

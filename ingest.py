@@ -124,7 +124,7 @@ def download_podcast(**kwargs):
             embedding_client=kwargs['embedding_client'] if 'embedding_client' in kwargs.keys() else None,
             embedding_model=kwargs['embedding_model'] if 'embedding_model' in kwargs.keys() else None
             )
-    elif option == "3. Provide a name of a podcast to explore its most recent episode":
+    elif option == "3. Search by keyword":
         found_podcasts = kwargs['found_podcasts']
         selected_index = kwargs['selected_index']
         episode_details = download_episode_from_name(found_podcasts[selected_index]['collectionId'], found_podcasts[selected_index]['collectionName'])
@@ -138,9 +138,9 @@ def transcribe_podcast(**kwargs):
         chunks, text = episode_details['chunks'], episode_details['text']
     else:
         transcription_method = kwargs['transcription_method']
-        if transcription_method == "1. Replicate":
+        if transcription_method == "1. Local transcription":
             chunks, text = transcribe_with_replicate(kwargs['transcription_client'], episode_details['filenames'], n_splits=1)
-        elif transcription_method == "2. Local transcription":
+        elif transcription_method == "2. Replicate":
             chunks, text = transcribe_with_whistler(episode_details['filenames'], n_splits=1) # 4 splits took 800 seconds / try it in streamlit
     
     return {'chunks': chunks, 'text': text}
@@ -177,7 +177,7 @@ def encode_podcast(**kwargs):
 
     if sentence_encoder == "1. T5":
         documents = create_t5_embedding(kwargs['encoder'], episode_details['chunks'])
-    elif sentence_encoder == "2. OpenAI":
+    elif sentence_encoder == "2. OpenAI embeddings-3":
         documents = create_oa_embedding(kwargs['embedding_client'], kwargs['embedding_model'], episode_details['chunks'])
 
     return {'documents': documents}

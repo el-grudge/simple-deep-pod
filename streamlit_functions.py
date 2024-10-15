@@ -29,7 +29,7 @@ def choose_podcast_option():
         options = (
             "1. Try a sample",
             "2. Provide the iTunes URL for a specific podcast episode",
-            "3. Provide a name of a podcast to explore its most recent episode"
+            "3. Search by keyword"
             ),
         index=None,
     )
@@ -39,7 +39,7 @@ def choose_podcast_option():
     elif episode_option == "2. Provide the iTunes URL for a specific podcast episode":
         episode_url = st.text_input("Enter the iTunes URL of the episode you want:")
         update_session(episode_option_selected=True, episode_option=episode_option, episode_url=episode_url)
-    elif episode_option == "3. Provide a name of a podcast to explore its most recent episode":
+    elif episode_option == "3. Search by keyword":
         term = st.text_input("Enter a search term for podcasts:")
         try:
             if term != '':
@@ -61,7 +61,7 @@ def choose_encoder():
         "Choose your option:",
         options = (
             "1. T5",
-            "2. OpenAI"
+            "2. OpenAI embeddings-3"
         ),
         index=None
     )
@@ -69,7 +69,7 @@ def choose_encoder():
     if sentence_encoder == "1. T5":
         encoder=SentenceTransformer("sentence-transformers/sentence-t5-base")
         update_session(sentence_encoder_selected=True, sentence_encoder=sentence_encoder, encoder=encoder)
-    elif sentence_encoder == "2. OpenAI":
+    elif sentence_encoder == "2. OpenAI embeddings-3":
         embedding_model = "text-embedding-3-large"
         openai_api_key = st.text_input("OpenAI API Key", key="file_oa_api_key", type="password")
         if openai_api_key != '':
@@ -88,13 +88,13 @@ def choose_transcription_method():
             transcription_method = st.radio(
                 "Choose your option:",
                 options = (
-                    "1. Replicate",
-                    "2. Local transcription",
+                    "1. Local transcription",
+                    "2. Replicate",
                 ),
                 index=None,
             )
             update_session(transcription_method_selected=False)
-            if transcription_method=="1. Replicate":
+            if transcription_method=="1. Local transcription":
                 replicate_api_key = st.text_input("Replicate API Key", key="file_replicate_api_key", type="password")            
                 if replicate_api_key != '':
                     try:
@@ -103,7 +103,7 @@ def choose_transcription_method():
                         update_session(transcription_method_selected=True, transcription_method=transcription_method, transcription_client=replicate_client)
                     except:
                         st.warning("Invalid API key. Please provide a valid API token.")
-            elif transcription_method=="2. Local transcription":
+            elif transcription_method=="2. Replicate":
                 update_session(transcription_method_selected=True, transcription_method=transcription_method)
         else:
             st.success("The sample podcast doesn't require a transcription method.")
@@ -165,7 +165,7 @@ def choose_llm():
     )
     update_session(llm_option_selected=False)
     if llm_option == "1. GPT-4o":
-        if st.session_state['sentence_encoder'] != "2. OpenAI":
+        if st.session_state['sentence_encoder'] != "2. OpenAI embeddings-3":
             openai_api_key = st.text_input("OpenAI API Key", key="file_oa_api_key", type="password")
             if openai_api_key != '':
                 try:

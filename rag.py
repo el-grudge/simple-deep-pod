@@ -14,7 +14,7 @@ def search(query, **kwargs):
         # Encode the query
         if kwargs['sentence_encoder'] == "1. T5":
             query_vector = kwargs['encoder'].encode(query).tolist()
-        elif kwargs['sentence_encoder'] == "2. OpenAI":
+        elif kwargs['sentence_encoder'] == "2. OpenAI embeddings-3":
             query_vector = kwargs['embedding_client'].embeddings.create(model=kwargs['embedding_model'], input=query).data[0].embedding[:768]
 
         # Construct the search query
@@ -42,7 +42,7 @@ def search(query, **kwargs):
         # Encode the query
         if kwargs['sentence_encoder'] == "1. T5":
             query_vector = kwargs['encoder'].encode(query).tolist()
-        elif kwargs['sentence_encoder'] == "2. OpenAI":
+        elif kwargs['sentence_encoder'] == "2. OpenAI embeddings-3":
             query_vector = kwargs['embedding_client'].embeddings.create(model=kwargs['embedding_model'], input=query).data[0].embedding[:768]
         
         # Perform cosine similarity search in ChromaDB

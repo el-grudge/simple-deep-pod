@@ -44,7 +44,7 @@ def get_feed_details(feed_url, **kwargs):
     # Batch encode the titles
     if kwargs['sentence_encoder'] == "1. T5":
         title_vectors = kwargs['encoder'].encode(titles, batch_size=32).tolist()
-    elif kwargs['sentence_encoder'] == "2. OpenAI":
+    elif kwargs['sentence_encoder'] == "2. OpenAI embeddings-3":
         title_vectors = [kwargs['embedding_client'].embeddings.create(model=kwargs['embedding_model'], input=title).data[0].embedding[:768] for title in titles]
     
     # Iterate through feed.entries and use precomputed vectors
@@ -67,7 +67,7 @@ def search_for_episode(episode_title, feed_details, **kwargs):
     # Batch encode the titles
     if kwargs['sentence_encoder'] == "1. T5":
         query_vector = kwargs['encoder'].encode(remove_punctuation(episode_title)).tolist()
-    elif kwargs['sentence_encoder'] == "2. OpenAI":
+    elif kwargs['sentence_encoder'] == "2. OpenAI embeddings-3":
         query_vector = kwargs['embedding_client'].embeddings.create(model=kwargs['embedding_model'], input=remove_punctuation(episode_title)).data[0].embedding[:768] 
 
     [d.update({'cos_sim': pytorch_cos_sim(d['title_vector'], query_vector)}) for d in feed_details]

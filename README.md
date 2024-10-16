@@ -80,7 +80,7 @@ I compared the retrieval performance of the 3 indexes on their Hit-Rate, MRR, an
 |---------------|----------|--------|------------------------|
 | Minsearch     | 71.69%   | 54.00% | 0.0057 seconds         |
 | Elasticsearch | 74.15%   | 60.90% | 0.0893 seconds         |
-| ChromDB       | 70.80%   | 29.65% | 0.0200 seconds         |
+| ChromeDB       | 70.80%   | 29.65% | 0.0200 seconds         |
 
 The Hit-Rate (aka Recall) is calculated as follows:
 
@@ -173,9 +173,9 @@ Run the app using `streamlit run interface.py`
 
 ⚠️ In progress (...)
 
-## Bonus points (not covered in the course)
+## Notes
 
-The streamlit app was deployed on the streamlit community cloud, where it can be accessed [here](https://deep-pod.streamlit.app/). 
+The streamlit app was deployed on the streamlit community cloud, where it can be accessed [here](https://simple-deep-pod.streamlit.app/). 
 
 Also, Elasticsearch cloud was used as the vector store. Alternatively, Elasticsearch can be run locally using the following command:
 
@@ -195,3 +195,26 @@ docker run -it \
 ```
 
 Make sure to change the code that defines the Elasticsearch client to point to  [localhost:9200](localhost:9200)
+
+If you are running the app locally and want to make it accessible online, you can use ngrok - an API gateway. You can install and run ngrok with these commands:
+
+Install:
+
+```bash
+curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
+	| sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
+	&& echo "deb https://ngrok-agent.s3.amazonaws.com buster main" \
+	| sudo tee /etc/apt/sources.list.d/ngrok.list \
+	&& sudo apt update \
+	&& sudo apt install ngrok
+```
+
+Authenticate: 
+
+```bash
+ngrok config add-authtoken [your-key-goes-here]
+```
+
+```bash
+ngrok http http://localhost:8080
+```

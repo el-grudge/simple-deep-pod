@@ -4,7 +4,11 @@
 
 ## Problem description
 
-This is deep-pod 🎙️, a streamlit app that allows you to interact with your podcast through:
+### What the problem solves
+
+ChatGPT is great with text sources, but so far it can't deal with non-text data sources out-of-the-box. DEEP-POD solves this problem!
+
+DEEP-POD is a streamlit app that allows you to interact with podcasts through:
 
 1. Chat 💬
 2. Summary 📝
@@ -13,6 +17,8 @@ This is deep-pod 🎙️, a streamlit app that allows you to interact with your 
 Check out the [DEEP-POD infographic](DEEP-POD-Infographic.pdf) for a discussion on the general architecture and design of the tool and how each component was evaluated.
 
 **You can try the app [here](https://simple-deep-pod.streamlit.app/) 🚀**
+
+You can also watch a video demonstrating how to use the tool [here](https://www.youtube.com/watch?v=KfvTXmTHRkI). 
 
 **Chat 💬**
 
@@ -78,9 +84,9 @@ I compared the retrieval performance of the 3 indexes on their Hit-Rate, MRR, an
 
 | Search Engine | Hit Rate | MRR    | Average Retrieval Time |
 |---------------|----------|--------|------------------------|
-| Minsearch     | 71.69%   | 54.00% | 0.0057 seconds         |
-| Elasticsearch | 74.15%   | 60.90% | 0.0893 seconds         |
-| ChromeDB       | 70.80%   | 29.65% | 0.0200 seconds         |
+| [Minsearch](./evaluations/measure_retrieval_speed_Evaluate-Minsearch.ipynb)     | 71.69%   | 54.00% | 0.0057 seconds         |
+| [Elasticsearch](./evaluations/measure_retrieval_speed_Evaluate-Elasticsearch.ipynb) | 74.15%   | 60.90% | 0.0893 seconds         |
+| [ChromeDB](./evaluations/measure_retrieval_speed_Evaluate-ChromaDB.ipynb)      | 70.80%   | 29.65% | 0.0200 seconds         |
 
 The Hit-Rate (aka Recall) is calculated as follows:
 
@@ -111,6 +117,7 @@ Here are the results:
 | GPT-4o | 54.5%    | 36.0%           | 9.5%         |
 | FLAN-5 | 0.00%    | 61.0%           | 39%          |
 
+You can view the code [here](./evaluations/evaluate_RAG.ipynb)
 
 ## Interface
 
@@ -133,7 +140,24 @@ Check the ingestion code [here](ingest.py)
 
 ## Containerization 
 
-⚠️ In progress (...)
+To run Elasticsearch with Docker use the following command:
+
+```bash
+docker network create elastic
+
+docker run -it \
+    --rm \
+    --name elasticsearch \
+    -p 9200:9200 \
+    -p 9300:9300 \
+    -e "discovery.type=single-node" \
+    -e "xpack.security.enabled=false" \
+    -e "ES_JAVA_OPTS=-Xms2g -Xmx2g" \
+    --memory=4g \
+    docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+```
+
+Make sure to change the code that defines the Elasticsearch client to point to  [localhost:9200](localhost:9200)
 
 ## Reproducibility 
 
@@ -171,30 +195,27 @@ Run the app using `streamlit run interface.py`
 
 ## Best practices
 
+### Hybrid search: combining both text and vector search
+
 ⚠️ In progress (...)
 
-## Notes
+## Bonus points
+
+### Cloud
 
 The streamlit app was deployed on the streamlit community cloud, where it can be accessed [here](https://simple-deep-pod.streamlit.app/). 
 
-Also, Elasticsearch cloud was used as the vector store. Alternatively, Elasticsearch can be run locally using the following command:
+Also, Elasticsearch cloud was used as the vector store. To use Elasticsearch cloud, the Elasticsearch client has to be defined like this:
 
-```bash
-docker network create elastic
-
-docker run -it \
-    --rm \
-    --name elasticsearch \
-    -p 9200:9200 \
-    -p 9300:9300 \
-    -e "discovery.type=single-node" \
-    -e "xpack.security.enabled=false" \
-    -e "ES_JAVA_OPTS=-Xms2g -Xmx2g" \
-    --memory=4g \
-    docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+```python
+es_client = Elasticsearch(cloud_id=elasticsearch_cloud_id, api_key=elasticsearch_api_key)
 ```
 
-Make sure to change the code that defines the Elasticsearch client to point to  [localhost:9200](localhost:9200)
+Check the [streamlit_functions.py](./streamlit_functions.py) for more details.
+
+Alternatively, Elasticsearch can be run locally as discussed in the [containerization](#containerization) section.
+
+### Extra
 
 If you are running the app locally and want to make it accessible online, you can use ngrok - an API gateway. You can install and run ngrok with these commands:
 
